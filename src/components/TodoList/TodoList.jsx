@@ -1,6 +1,10 @@
 import Todo from "../Todo/Todo";
+import TodoContext from "../../context/TodoContext";
+import { useContext } from "react";
 
-function TodoList({ list, updateList }) {
+function TodoList() {
+    const { list, setList } = useContext(TodoContext);
+
     return (
         <div>
             {list.length > 0 && list.map(todo => (
@@ -10,14 +14,27 @@ function TodoList({ list, updateList }) {
                     isFinished={todo.finished} 
                     todoData={todo.todoData} 
                     changeFinished={(isFinished) => {
-                        console.log("isFinished", isFinished)
+                        console.log("isFinished", isFinished);
                         const updatedList = list.map(t => {
-                            if(t.id == todo.id) {
-                                 todo.finished = isFinished; // Updating the finished property of the current todo
+                            if(t.id === todo.id) {
+                                return { ...t, finished: isFinished }; // Correctly update the finished property of the current todo
                             }
                             return t;
                         });
-                        updateList(updatedList); // Calling the updateList function with the updated list
+                        setList(updatedList);
+                    }}
+                    onDelete={() => {
+                        const updatedList = list.filter(t => t.id !== todo.id); // Use !== instead of !=
+                        setList(updatedList);
+                    }}
+                    onEdit={(todoText) => {
+                        const updatedList = list.map(t => {
+                            if(t.id == todo.id) {
+                                todo.todoData = todoText;
+                            }
+                            return t;
+                        });
+                        setList(updatedList);
                     }}
                 />
             ))}
